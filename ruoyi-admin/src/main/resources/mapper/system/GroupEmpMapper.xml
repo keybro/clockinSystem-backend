@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.GroupEmpMapper">
+    
+    <resultMap type="GroupEmp" id="GroupEmpResult">
+        <result property="id"    column="id"    />
+        <result property="gid"    column="gid"    />
+        <result property="eid"    column="eid"    />
+        <result property="cts"    column="cts"    />
+    </resultMap>
+
+    <sql id="selectGroupEmpVo">
+        select id, gid, eid, cts from group_emp
+    </sql>
+
+    <select id="selectGroupEmpList" parameterType="GroupEmp" resultMap="GroupEmpResult">
+        <include refid="selectGroupEmpVo"/>
+        <where>  
+            <if test="gid != null "> and gid = #{gid}</if>
+            <if test="eid != null "> and eid = #{eid}</if>
+            <if test="cts != null  and cts != ''"> and cts = #{cts}</if>
+        </where>
+    </select>
+    
+    <select id="selectGroupEmpById" parameterType="Long" resultMap="GroupEmpResult">
+        <include refid="selectGroupEmpVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertGroupEmp" parameterType="GroupEmp" useGeneratedKeys="true" keyProperty="id">
+        insert into group_emp
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="gid != null">gid,</if>
+            <if test="eid != null">eid,</if>
+            <if test="cts != null">cts,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="gid != null">#{gid},</if>
+            <if test="eid != null">#{eid},</if>
+            <if test="cts != null">#{cts},</if>
+         </trim>
+    </insert>
+
+    <update id="updateGroupEmp" parameterType="GroupEmp">
+        update group_emp
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="gid != null">gid = #{gid},</if>
+            <if test="eid != null">eid = #{eid},</if>
+            <if test="cts != null">cts = #{cts},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteGroupEmpById" parameterType="Long">
+        delete from group_emp where id = #{id}
+    </delete>
+
+    <delete id="deleteGroupEmpByIds" parameterType="String">
+        delete from group_emp where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

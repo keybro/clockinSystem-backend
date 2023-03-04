@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.ClockinMapper">
+    
+    <resultMap type="Clockin" id="ClockinResult">
+        <result property="id"    column="id"    />
+        <result property="employeesId"    column="employees_id"    />
+        <result property="cts"    column="cts"    />
+        <result property="day"    column="day"    />
+        <result property="dkstartTs"    column="dkstart_ts"    />
+        <result property="dkendTs"    column="dkend_ts"    />
+        <result property="isLate"    column="is_late"    />
+        <result property="leaveEarly"    column="leave_early"    />
+        <association property="sysDept"    column="dept_id" javaType="SysDept" resultMap="deptResult" />
+        <association property="sysUser"    column="user_id" javaType="SysUser" resultMap="userResult" />
+    </resultMap>
+
+    <resultMap id="deptResult" type="SysDept">
+        <id     property="deptId"    column="dept_id"     />
+        <result property="deptName"  column="dept_name"   />
+    </resultMap>
+
+    <resultMap id="userResult" type="SysUser">
+        <id     property="userId"    column="user_id"     />
+        <result property="nickName"  column="nick_name"   />
+    </resultMap>
+
+    <sql id="selectClockinVo">
+        select id, employees_id, cts, day, dkstart_ts, dkend_ts, is_late, leave_early,sys_dept.dept_id,sys_user.nick_name
+        from clockin
+            LEFT JOIN sys_user ON sys_user.user_id = clockin.employees_id
+            LEFT JOIN sys_dept ON sys_dept.dept_id = sys_user.dept_id
+    </sql>
+
+    <select id="selectClockinList" parameterType="Clockin" resultMap="ClockinResult">
+        <include refid="selectClockinVo"/>
+        <where>  
+            <if test="employeesId != null "> and employees_id = #{employeesId}</if>
+            <if test="cts != null "> and cts = #{cts}</if>
+            <if test="day != null "> and day = #{day}</if>
+            <if test="dkstartTs != null "> and dkstart_ts = #{dkstartTs}</if>
+            <if test="dkendTs != null "> and dkend_ts = #{dkendTs}</if>
+            <if test="isLate != null "> and is_late = #{isLate}</if>
+            <if test="leaveEarly != null "> and leave_early = #{leaveEarly}</if>
+            <if test="deptId != null "> and sys_dept.dept_id = #{deptId}</if>
+            <if test="nickName != null "> and sys_user.nick_name = #{nickName}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                and date_format(clockin.day,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                and date_format(clockin.day,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+        </where>
+    </select>
+    
+    <select id="selectClockinById" parameterType="Long" resultMap="ClockinResult">
+        <include refid="selectClockinVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertClockin" parameterType="Clockin" useGeneratedKeys="true" keyProperty="id">
+        insert into clockin
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="employeesId != null">employees_id,</if>
+            <if test="cts != null">cts,</if>
+            <if test="day != null">day,</if>
+            <if test="dkstartTs != null">dkstart_ts,</if>
+            <if test="dkendTs != null">dkend_ts,</if>
+            <if test="isLate != null">is_late,</if>
+            <if test="leaveEarly != null">leave_early,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="employeesId != null">#{employeesId},</if>
+            <if test="cts != null">#{cts},</if>
+            <if test="day != null">#{day},</if>
+            <if test="dkstartTs != null">#{dkstartTs},</if>
+            <if test="dkendTs != null">#{dkendTs},</if>
+            <if test="isLate != null">#{isLate},</if>
+            <if test="leaveEarly != null">#{leaveEarly},</if>
+         </trim>
+    </insert>
+
+    <update id="updateClockin" parameterType="Clockin">
+        update clockin
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="employeesId != null">employees_id = #{employeesId},</if>
+            <if test="cts != null">cts = #{cts},</if>
+            <if test="day != null">day = #{day},</if>
+            <if test="dkstartTs != null">dkstart_ts = #{dkstartTs},</if>
+            <if test="dkendTs != null">dkend_ts = #{dkendTs},</if>
+            <if test="isLate != null">is_late = #{isLate},</if>
+            <if test="leaveEarly != null">leave_early = #{leaveEarly},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteClockinById" parameterType="Long">
+        delete from clockin where id = #{id}
+    </delete>
+
+    <delete id="deleteClockinByIds" parameterType="String">
+        delete from clockin where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

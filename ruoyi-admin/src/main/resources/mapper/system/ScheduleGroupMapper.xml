@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.ScheduleGroupMapper">
+    
+    <resultMap type="ScheduleGroup" id="ScheduleGroupResult">
+        <result property="id"    column="id"    />
+        <result property="gdesc"    column="gdesc"    />
+        <result property="depId"    column="dep_id"    />
+        <result property="cts"    column="cts"    />
+        <result property="startTs"    column="start_ts"    />
+        <result property="endTs"    column="end_ts"    />
+    </resultMap>
+
+    <sql id="selectScheduleGroupVo">
+        select id, gdesc, dep_id, cts, start_ts, end_ts from schedule_group
+    </sql>
+
+    <select id="selectScheduleGroupList" parameterType="ScheduleGroup" resultMap="ScheduleGroupResult">
+        <include refid="selectScheduleGroupVo"/>
+        <where>  
+            <if test="gdesc != null  and gdesc != ''"> and gdesc = #{gdesc}</if>
+            <if test="depId != null "> and dep_id = #{depId}</if>
+            <if test="cts != null  and cts != ''"> and cts = #{cts}</if>
+            <if test="startTs != null  and startTs != ''"> and start_ts = #{startTs}</if>
+            <if test="endTs != null  and endTs != ''"> and end_ts = #{endTs}</if>
+        </where>
+    </select>
+    
+    <select id="selectScheduleGroupById" parameterType="Long" resultMap="ScheduleGroupResult">
+        <include refid="selectScheduleGroupVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertScheduleGroup" parameterType="ScheduleGroup" useGeneratedKeys="true" keyProperty="id">
+        insert into schedule_group
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="gdesc != null">gdesc,</if>
+            <if test="depId != null">dep_id,</if>
+            <if test="cts != null">cts,</if>
+            <if test="startTs != null">start_ts,</if>
+            <if test="endTs != null">end_ts,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="gdesc != null">#{gdesc},</if>
+            <if test="depId != null">#{depId},</if>
+            <if test="cts != null">#{cts},</if>
+            <if test="startTs != null">#{startTs},</if>
+            <if test="endTs != null">#{endTs},</if>
+         </trim>
+    </insert>
+
+    <update id="updateScheduleGroup" parameterType="ScheduleGroup">
+        update schedule_group
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="gdesc != null">gdesc = #{gdesc},</if>
+            <if test="depId != null">dep_id = #{depId},</if>
+            <if test="cts != null">cts = #{cts},</if>
+            <if test="startTs != null">start_ts = #{startTs},</if>
+            <if test="endTs != null">end_ts = #{endTs},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteScheduleGroupById" parameterType="Long">
+        delete from schedule_group where id = #{id}
+    </delete>
+
+    <delete id="deleteScheduleGroupByIds" parameterType="String">
+        delete from schedule_group where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
